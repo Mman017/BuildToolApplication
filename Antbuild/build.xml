@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-demo" default="jar-docu" basedir=".">
+	
+	<target name="run" depends="compile">
+		<echo>Hint Filename: app </echo>
+		<input message="Name of the class file: " addproperty="file-name"/>
+		<java classname="com.autobots.${file-name}">
+			<classpath path="src"/>
+		</java>
+	</target>
+	
+	<target name="compile" depends="removeBuild">
+		<javac includeantruntime="false" srcdir="./src" />
+	</target>
+	
+
+    <target name="removeBuild" depends="setup, continue" if="allIsWellBool">
+       	<delete includeEmptyDirs="true">
+        	  <fileset dir="build" erroronmissingdir="false"/>
+        </delete>
+    </target>
+ 
+    <target name="setup">
+ 
+        <input message="Do you want to delete the build folder?[y/n]" addproperty="somethingProp"/>
+ 
+        <condition property="allIsWellBool">
+            <not>
+                <equals arg1="${somethingProp}" arg2="" trim="y"/>
+            </not>
+        </condition>
+    </target>
+	
+    <target name="continue" depends="setup" unless="allIsWellBool">
+ 
+    </target>
+ 
+	
+	<target name="createFile" depends="run">
+		<mkdir dir="build"/>
+		<mkdir dir="build\Folder1"/>
+		<mkdir dir="build\Folder2"/>
+		<mkdir dir="build\Folder3"/>
+	</target>
+	
+ 
+	<target name="copy" depends="createFile">
+	
+	<copy file="src\com\autobots\app.java" todir="build\Folder1"/>
+	<copy file="src\com\autobots\app.class" todir="build\Folder1"/>
+	<copy file="src\com\autobots\calculator.java" todir="build\Folder2"/>
+	<copy file="src\com\autobots\calculator.class" todir="build\Folder2"/>
+	<copy file="src\com\autobots\RelQuantifiers.java" todir="build\Folder3"/>
+	<copy file="src\com\autobots\RelQuantifiers.class" todir="build\Folder3"/>	
+	</target>
+	
+	<target name="javadoc" depends="copy">
+		<javadoc packagenames="com.autobots.*"
+		         sourcepath="src"
+		         excludepackagenames="com.autobots.doc-files.*"
+		         defaultexcludes="yes"
+		         destdir="build/javadocs"
+		         author="true"
+		         version="true"
+		         use="true"
+		         windowtitle="Test API">
+		  <doctitle><![CDATA[<h1>Apache Ant Automation</h1>]]></doctitle>
+		  <bottom><![CDATA[<i>Copyright &#169; 2020 AutoBots. All Rights Reserved.</i>]]></bottom>
+		  <tag name="todo" scope="all" description="To do:"/>
+		</javadoc>
+	</target>
+	
+
+	<target name="jar-classes" depends="javadoc">
+		<jar destfile="build/classes.jar"
+		     basedir="src"/>
+	</target>
+	
+	
+	<target name="jar-docu" depends="jar-classes">
+		<jar destfile="build/documentaries.jar"
+		     basedir="build/javadocs"/>
+	</target>
+	
+	
+	
+
+</project>
